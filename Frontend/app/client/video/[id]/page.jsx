@@ -1,77 +1,79 @@
-"use client"
+"use client";
 
-import { useState, useRef, useEffect } from "react"
-import { useSearchParams } from "next/navigation" // Import this to get videoId from URL
-import { Button } from "@/components/ui/button"
-import { Play, Pause, Volume2, VolumeX, Maximize, ThumbsUp, MessageSquare, Share2 } from "lucide-react"
+import { useState, useRef, useEffect } from "react";
+import { useParams } from "next/navigation"; // ✅ Use useParams for dynamic route
+import { Button } from "@/components/ui/button";
+import { Play, Pause, Volume2, VolumeX, Maximize, ThumbsUp, MessageSquare, Share2 } from "lucide-react";
 
 export default function VideoPage() {
-  const videoRef = useRef(null)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [isMuted, setIsMuted] = useState(false)
-  const [currentTime, setCurrentTime] = useState(0)
-  const [duration, setDuration] = useState(0)
-  const [progress, setProgress] = useState(0)
-  const [videoDetails, setVideoDetails] = useState(null)
+  const videoRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [videoDetails, setVideoDetails] = useState(null);
 
-  const searchParams = useSearchParams()
-  const videoId = searchParams.get("videoId") // Get videoId from query params
+  const { videoId } = useParams(); // ✅ Get videoId from URL params
 
   useEffect(() => {
-    if (!videoId) return // Prevent API call if videoId is missing
+    if (!videoId) return;
+    console.log("Fetching video for ID:", videoId);
 
-    fetch("http://localhost:8080/videos/all")
+    fetch(`http://localhost:8080/videos/${videoId}`)
       .then((res) => res.json())
-      .then((data) => setVideoDetails(data))
-      .catch((err) => console.error("Error fetching video:", err))
-  }, [videoId]) // Depend on videoId to refetch when it changes
+      .then((data) => {
+        console.log("Fetched video data:", data);
+        setVideoDetails(data);
+      })
+      .catch((err) => console.error("Error fetching video:", err));
+  }, [videoId]);
 
   useEffect(() => {
-    const video = videoRef.current
-
+    const video = videoRef.current;
     if (video) {
       const updateTime = () => {
-        setCurrentTime(video.currentTime)
-        setProgress((video.currentTime / video.duration) * 100)
-      }
+        setCurrentTime(video.currentTime);
+        setProgress((video.currentTime / video.duration) * 100);
+      };
 
       const handleLoadedMetadata = () => {
-        setDuration(video.duration)
-      }
+        setDuration(video.duration);
+      };
 
-      video.addEventListener("timeupdate", updateTime)
-      video.addEventListener("loadedmetadata", handleLoadedMetadata)
+      video.addEventListener("timeupdate", updateTime);
+      video.addEventListener("loadedmetadata", handleLoadedMetadata);
 
       return () => {
-        video.removeEventListener("timeupdate", updateTime)
-        video.removeEventListener("loadedmetadata", handleLoadedMetadata)
-      }
+        video.removeEventListener("timeupdate", updateTime);
+        video.removeEventListener("loadedmetadata", handleLoadedMetadata);
+      };
     }
-  }, [])
+  }, []);
 
   const togglePlay = () => {
     if (videoRef.current) {
       if (isPlaying) {
-        videoRef.current.pause()
+        videoRef.current.pause();
       } else {
-        videoRef.current.play()
+        videoRef.current.play();
       }
-      setIsPlaying(!isPlaying)
+      setIsPlaying(!isPlaying);
     }
-  }
+  };
 
   const toggleMute = () => {
     if (videoRef.current) {
-      videoRef.current.muted = !isMuted
-      setIsMuted(!isMuted)
+      videoRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
     }
-  }
+  };
 
   const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = Math.floor(seconds % 60)
-    return `${mins}:${secs.toString().padStart(2, "0")}`
-  }
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
 
   return (
     <div className="container mx-auto px-4 py-6">
@@ -131,5 +133,5 @@ export default function VideoPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
