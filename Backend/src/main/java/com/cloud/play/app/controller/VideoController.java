@@ -92,6 +92,25 @@ public class VideoController {
         return ResponseEntity.ok(videoList);
     }
 
+    @PutMapping("/{id}/like")
+    public ResponseEntity<Map<String, Integer>> likeVideo(@PathVariable String id) {
+        Optional<Video> optionalVideo = videoRepository.findById(id);
+
+        if (optionalVideo.isPresent()) {
+            Video video = optionalVideo.get();
+            video.setLikesCount(video.getLikesCount() + 1); // Increase likes count
+            videoRepository.save(video); // Save the updated video
+
+            Map<String, Integer> response = new HashMap<>();
+            response.put("likesCount", video.getLikesCount());
+
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+
 
     private String getVideoDuration(MultipartFile file) throws IOException, InterruptedException {
         File tempFile = File.createTempFile("uploaded", ".mp4");

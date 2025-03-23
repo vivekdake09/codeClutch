@@ -8,7 +8,7 @@ export default function ClientLayout({ children }) {
     <div className="flex flex-col min-h-screen">
       <header className="border-b sticky top-0 z-10 bg-background">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <Link href="/client" className="font-bold text-xl">
+          <Link href="/" className="font-bold text-xl">
             CloudPlay
           </Link>
 

@@ -25,7 +25,7 @@ export default function ClientHome() {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <section className="mb-10">
+      {/* <section className="mb-10">
         <div className="relative aspect-video rounded-xl overflow-hidden">
           <img
             src={videos[0]?.videoUrl || "/placeholder.svg"}
@@ -47,7 +47,7 @@ export default function ClientHome() {
             </Link>
           </div>
         </div>
-      </section>
+      </section> */}
 
       <section>
         <Tabs defaultValue="all">
@@ -77,9 +77,9 @@ export default function ClientHome() {
 function VideoCard({ video }) {
   return (
     <Card className="overflow-hidden">
-      <Link href={video.videoUrl}>
+      <Link href={`/client/video/${video.id}`}>
         <div className="relative aspect-video">
-          <img src={video.videoUrl} alt={video.title} className="w-full h-full object-cover" />
+          <img src={`${video.videoUrl.replace(".mp4", ".jpg")}`} alt={video.title} className="w-full h-full object-cover" />
           <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
             {video.duration}
           </div>

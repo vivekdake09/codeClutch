@@ -59,7 +59,9 @@ export default function LoginPage() {
         <Card className="w-full bg-transparent shadow-none">
           <form onSubmit={handleSubmit}>
             <CardHeader>
-              <CardTitle className="text-white text-xl">Login</CardTitle>
+            
+                <CardTitle className="text-white text-xl cursor-pointer hover:underline">Login</CardTitle>
+
               <CardDescription className="text-gray-300">Access your CloudPlay account</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -104,9 +106,10 @@ export default function LoginPage() {
                 <Button 
                   type="submit" 
                   className="w-full text-lg py-3 rounded-xl shadow-lg bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-indigo-600 hover:to-purple-600 transition-all"
-                  disabled={isLoading}
-                >
+                  disabled={isLoading}>
+                    <Link href="/client">
                   {isLoading ? "Logging in..." : "Login"}
+                  </Link>
                 </Button>
               </motion.div>
               <p className="text-center text-sm text-gray-300">

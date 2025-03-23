@@ -138,13 +138,13 @@ export default function RegisterPage() {
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button 
+              <Link href="/login"> <Button 
                   type="submit" 
                   className="w-full text-lg py-3 rounded-xl shadow-lg bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-indigo-600 hover:to-purple-600 transition-all"
                   disabled={isLoading}
-                >
+                > 
                   {isLoading ? "Creating account..." : "Create Account"}
-                </Button>
+                </Button> </Link>
               </motion.div>
               <p className="text-center text-sm text-gray-300">
                 Already have an account?{" "}
