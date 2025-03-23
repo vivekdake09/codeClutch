@@ -9,7 +9,7 @@ export default function ClientLayout({ children }) {
       <header className="border-b sticky top-0 z-10 bg-background">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <Link href="/client" className="font-bold text-xl">
-            Video Platform
+            CloudPlay
           </Link>
 
           <div className="hidden md:flex items-center space-x-1 flex-1 max-w-md mx-4">
@@ -29,7 +29,7 @@ export default function ClientLayout({ children }) {
 
       <footer className="border-t py-6">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} Video Platform. All rights reserved.
+          &copy; {new Date().getFullYear()} CloudPlay. All rights reserved.
         </div>
       </footer>
     </div>

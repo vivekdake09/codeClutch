@@ -6,55 +6,21 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Play, Pause, Volume2, VolumeX, Maximize, ThumbsUp, MessageSquare, Share2 } from "lucide-react"
 
-// Mock data for video details
-const getVideoDetails = (id) => {
-  return {
-    id,
-    title: "Complete Guide to Modern Web Development",
-    description:
-      "Learn everything you need to know about modern web development in this comprehensive guide. We cover HTML, CSS, JavaScript, React, and more.",
-    views: 12543,
-    likes: 1876,
-    uploadDate: "2023-10-15",
-    duration: "24:18",
-    src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-  }
-}
-
-// Mock data for related videos
-const relatedVideos = [
-  {
-    id: 2,
-    title: "Advanced CSS Techniques",
-    duration: "24:18",
-    views: 982,
-    thumbnail: "/placeholder.svg?height=720&width=1280",
-  },
-  {
-    id: 3,
-    title: "JavaScript Fundamentals",
-    duration: "18:45",
-    views: 876,
-    thumbnail: "/placeholder.svg?height=720&width=1280",
-  },
-  {
-    id: 4,
-    title: "Building a REST API",
-    duration: "22:10",
-    views: 543,
-    thumbnail: "/placeholder.svg?height=720&width=1280",
-  },
-]
-
-export default function VideoPage({ params }) {
+export default function VideoPage() {
   const videoRef = useRef(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [isMuted, setIsMuted] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [progress, setProgress] = useState(0)
+  const [videoDetails, setVideoDetails] = useState(null)
 
-  const videoDetails = getVideoDetails(params.id)
+  useEffect(() => {
+    fetch("http://localhost:8080/videos/latest")
+      .then((res) => res.json())
+      .then((data) => setVideoDetails(data))
+      .catch((err) => console.error("Error fetching video:", err))
+  }, [])
 
   useEffect(() => {
     const video = videoRef.current
@@ -118,13 +84,15 @@ export default function VideoPage({ params }) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-4">
           <div className="relative bg-black rounded-lg overflow-hidden">
-            <video
-              ref={videoRef}
-              src={videoDetails.src}
-              className="w-full aspect-video"
-              onClick={togglePlay}
-              onEnded={() => setIsPlaying(false)}
-            />
+            {videoDetails && (
+              <video
+                ref={videoRef}
+                src={videoDetails.videoUrl}
+                className="w-full aspect-video"
+                onClick={togglePlay}
+                onEnded={() => setIsPlaying(false)}
+              />
+            )}
 
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
               <div className="w-full h-1 bg-white/30 rounded-full cursor-pointer mb-2" onClick={handleProgressClick}>
@@ -143,7 +111,6 @@ export default function VideoPage({ params }) {
                     {formatTime(currentTime)} / {formatTime(duration)}
                   </span>
                 </div>
-
                 <Button variant="ghost" size="icon" className="text-white">
                   <Maximize className="h-5 w-5" />
                 </Button>
@@ -151,70 +118,32 @@ export default function VideoPage({ params }) {
             </div>
           </div>
 
-          <div>
-            <h1 className="text-2xl font-bold">{videoDetails.title}</h1>
-            <div className="flex items-center justify-between mt-2">
-              <div className="text-sm text-muted-foreground">
-                {videoDetails.views.toLocaleString()} views • {new Date(videoDetails.uploadDate).toLocaleDateString()}
-              </div>
-              <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="sm" className="flex items-center">
-                  <ThumbsUp className="h-4 w-4 mr-2" />
-                  {videoDetails.likes.toLocaleString()}
-                </Button>
-                <Button variant="ghost" size="sm" className="flex items-center">
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  Comments
-                </Button>
-                <Button variant="ghost" size="sm" className="flex items-center">
-                  <Share2 className="h-4 w-4 mr-2" />
-                  Share
-                </Button>
+          {videoDetails && (
+            <div>
+              <h1 className="text-2xl font-bold">{videoDetails.title}</h1>
+              <div className="flex items-center justify-between mt-2">
+                <div className="text-sm text-muted-foreground">
+                  {videoDetails.views} views • {new Date(videoDetails.uploadDate).toLocaleDateString()}
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button variant="ghost" size="sm" className="flex items-center">
+                    <ThumbsUp className="h-4 w-4 mr-2" />
+                    {videoDetails.likes || 0}
+                  </Button>
+                  <Button variant="ghost" size="sm" className="flex items-center">
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Comments
+                  </Button>
+                  <Button variant="ghost" size="sm" className="flex items-center">
+                    <Share2 className="h-4 w-4 mr-2" />
+                    Share
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
-
-          <Tabs defaultValue="description">
-            <TabsList>
-              <TabsTrigger value="description">Description</TabsTrigger>
-              <TabsTrigger value="comments">Comments</TabsTrigger>
-            </TabsList>
-            <TabsContent value="description" className="mt-4">
-              <p className="text-muted-foreground">{videoDetails.description}</p>
-            </TabsContent>
-            <TabsContent value="comments" className="mt-4">
-              <p className="text-center text-muted-foreground py-8">Comments are disabled for this video</p>
-            </TabsContent>
-          </Tabs>
-        </div>
-
-        <div>
-          <h2 className="text-xl font-bold mb-4">Related Videos</h2>
-          <div className="space-y-4">
-            {relatedVideos.map((video) => (
-              <RelatedVideoCard key={video.id} video={video} />
-            ))}
-          </div>
+          )}
         </div>
       </div>
     </div>
   )
 }
-
-function RelatedVideoCard({ video }) {
-  return (
-    <Card className="overflow-hidden">
-      <div className="flex">
-        <div className="w-40 h-24 flex-shrink-0">
-          <img src={video.thumbnail || "/placeholder.svg"} alt={video.title} className="w-full h-full object-cover" />
-        </div>
-        <CardContent className="p-3">
-          <h3 className="font-medium text-sm line-clamp-2">{video.title}</h3>
-          <p className="text-xs text-muted-foreground mt-1">{video.views.toLocaleString()} views</p>
-          <p className="text-xs text-muted-foreground">{video.duration}</p>
-        </CardContent>
-      </div>
-    </Card>
-  )
-}
-
