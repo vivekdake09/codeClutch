@@ -1,60 +1,66 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Upload, X, Check, FileVideo } from "lucide-react"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Upload, X, Check, FileVideo } from "lucide-react";
 
 export default function VideoUpload() {
-  const [selectedFile, setSelectedFile] = useState(null)
-  const [uploading, setUploading] = useState(false)
-  const [uploadProgress, setUploadProgress] = useState(0)
-  const [uploadComplete, setUploadComplete] = useState(false)
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadComplete, setUploadComplete] = useState(false);
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0]
+    const file = e.target.files[0];
     if (file && file.type.startsWith("video/")) {
-      setSelectedFile(file)
-      setUploadComplete(false)
+      setSelectedFile(file);
+      setUploadComplete(false);
     }
-  }
+  };
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedFile) return;
 
-    if (!selectedFile) return
+    setUploading(true);
+    setUploadProgress(0);
 
-    setUploading(true)
-    setUploadProgress(0)
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+    formData.append("title", document.getElementById("title").value);
+    formData.append("description", document.getElementById("description").value);
 
-    // Simulate upload progress
-    const interval = setInterval(() => {
-      setUploadProgress((prevProgress) => {
-        const newProgress = prevProgress + 10
-        if (newProgress >= 100) {
-          clearInterval(interval)
-          setUploading(false)
-          setUploadComplete(true)
-          return 100
-        }
-        return newProgress
-      })
-    }, 500)
+    try {
+      const response = await fetch("http://localhost:8080/videos/upload", {
+        method: "POST",
+        body: formData,
+      });
 
-    // In a real application, you would use FormData and fetch/axios to upload the file
-    // const formData = new FormData()
-    // formData.append('video', selectedFile)
-    // fetch('/api/upload', { method: 'POST', body: formData })
-  }
+      if (!response.ok) {
+        throw new Error("Upload failed");
+      }
+
+      const result = await response.json(); // If backend returns JSON
+      console.log("Success:", result);
+
+      setUploadProgress(100);
+      setUploadComplete(true);
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const resetForm = () => {
-    setSelectedFile(null)
-    setUploadProgress(0)
-    setUploadComplete(false)
-  }
+    setSelectedFile(null);
+    setUploadProgress(0);
+    setUploadComplete(false);
+  };
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -74,7 +80,7 @@ export default function VideoUpload() {
 
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
-              <Textarea id="description" placeholder="Enter video description" rows={4} />
+              <Textarea id="description" placeholder="Enter video description" rows={4} required />
             </div>
 
             <div className="space-y-2">
@@ -130,10 +136,6 @@ export default function VideoUpload() {
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="tags">Tags</Label>
-              <Input id="tags" placeholder="Enter tags separated by commas" />
-            </div>
           </form>
         </CardContent>
         <CardFooter className="flex justify-between">
@@ -146,7 +148,7 @@ export default function VideoUpload() {
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }
 
 function FilePreview({ file }) {
@@ -154,6 +156,5 @@ function FilePreview({ file }) {
     <div className="w-10 h-10 rounded bg-muted flex items-center justify-center">
       <FileVideo className="h-5 w-5 text-muted-foreground" />
     </div>
-  )
+  );
 }
-
