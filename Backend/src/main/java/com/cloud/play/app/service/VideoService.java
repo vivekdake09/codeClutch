@@ -19,7 +19,8 @@ public class VideoService {
         Map uploadResult = cloudinary.uploader().upload(file.getBytes(),
                 ObjectUtils.asMap("resource_type", "video"));
 
-        return uploadResult.get("secure_url").toString(); // Returns the video URL
+        return uploadResult.get("secure_url").toString(); // Returns Cloudinary URL
     }
+
 }
 
